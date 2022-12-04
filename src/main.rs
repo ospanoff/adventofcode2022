@@ -1,5 +1,6 @@
 mod day1;
 mod day2;
+mod day3;
 
 use std::env;
 
@@ -13,6 +14,7 @@ fn main() {
     match args[1].as_str() {
         "1" => day1::solution(),
         "2" => day2::solution(),
+        "3" => day3::solution(),
         day => panic!("No solution for day {day}"),
     }
 }
