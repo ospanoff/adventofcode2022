@@ -5,6 +5,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 use std::env;
 
@@ -23,6 +24,7 @@ fn main() {
         "5" => day5::solution(),
         "6" => day6::solution(),
         "7" => day7::solution(),
+        "8" => day8::solution(),
         day => panic!("No solution for day {day}"),
     }
 }
