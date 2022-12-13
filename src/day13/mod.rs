@@ -1,11 +1,29 @@
-use std::fs;
+use std::{cmp::Ordering, fs};
 
 const FILE_PATH: &str = "src/day13/input";
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Item {
     pub value: Option<i32>,
     pub children: Vec<Box<Item>>,
+}
+
+impl Ord for Item {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let in_order = compare(self.to_owned(), other.to_owned());
+        if in_order < 0 {
+            return Ordering::Less;
+        } else if in_order > 0 {
+            return Ordering::Greater;
+        }
+        return Ordering::Equal;
+    }
+}
+
+impl PartialOrd for Item {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 pub fn solution() {
@@ -65,12 +83,12 @@ fn _print(root: Item, depth: usize) {
     }
 }
 
-fn in_right_order(root1: Item, root2: Item) -> i32 {
+fn compare(root1: Item, root2: Item) -> i32 {
     if let Some(val1) = root1.value {
         if let Some(val2) = root2.value {
             return (val1 - val2).signum();
         } else {
-            return in_right_order(
+            return compare(
                 Item {
                     value: None,
                     children: vec![Box::new(root1)],
@@ -79,7 +97,7 @@ fn in_right_order(root1: Item, root2: Item) -> i32 {
             );
         }
     } else if root2.value.is_some() {
-        return in_right_order(
+        return compare(
             root1,
             Item {
                 value: None,
@@ -94,7 +112,7 @@ fn in_right_order(root1: Item, root2: Item) -> i32 {
         root2.children.len()
     };
     for i in 0..min {
-        let in_order = in_right_order(*root1.children[i].to_owned(), *root2.children[i].to_owned());
+        let in_order = compare(*root1.children[i].to_owned(), *root2.children[i].to_owned());
         if in_order != 0 {
             return in_order;
         }
@@ -112,11 +130,32 @@ fn part_one(input: &String) {
         let group = group_str.split_once("\n").unwrap();
         let (root1, _) = parse_list(&String::from(group.0), 1);
         let (root2, _) = parse_list(&String::from(group.1), 1);
-        if in_right_order(root1, root2) < 0 {
+        if compare(root1, root2) < 0 {
             sum_ixs += i + 1;
         }
     }
     println!("Sum of indexes is {sum_ixs}");
 }
 
-fn part_two(_input: &String) {}
+fn part_two(input: &String) {
+    let mut packets: Vec<Item> = Vec::new();
+    for packet_str in input.split("\n").filter(|line| !line.is_empty()) {
+        let (packet, _) = parse_list(&String::from(packet_str), 1);
+        packets.push(packet);
+    }
+
+    let (delim2, _) = parse_list(&String::from("[[2]]"), 1);
+    packets.push(delim2.to_owned());
+    let (delim6, _) = parse_list(&String::from("[[6]]"), 1);
+    packets.push(delim6.to_owned());
+
+    packets.sort();
+
+    let key: usize = packets
+        .iter()
+        .enumerate()
+        .filter(|(_, packet)| **packet == delim2 || **packet == delim6)
+        .map(|(i, _)| i + 1)
+        .product();
+    println!("Decoder key is {key}");
+}
