@@ -3,6 +3,7 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
 mod day2;
 mod day3;
 mod day4;
@@ -35,6 +36,7 @@ fn main() {
         "11" => day11::solution(),
         "12" => day12::solution(),
         "13" => day13::solution(),
+        "14" => day14::solution(),
         day => panic!("No solution for day {day}"),
     }
 }
